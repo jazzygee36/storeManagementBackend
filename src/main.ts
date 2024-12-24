@@ -14,4 +14,4 @@ async function bootstrap() {
   await app.init();
 }
 bootstrap();
-export const handler = server;
+export default server;
