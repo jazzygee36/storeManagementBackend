@@ -16,6 +16,7 @@ async function bootstrap() {
 
     // Initialize the NestJS application
     await app.init();
+    console.log(`🚀 Application is deployed successfully!`);
   } catch (err) {
     console.error('Error during app initialization', err);
   }
