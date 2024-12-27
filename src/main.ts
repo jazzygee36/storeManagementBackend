@@ -1,17 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import * as express from 'express';
-
+import express from 'express';
 const server = express();
 
 async function bootstrap() {
   try {
     // const app = await NestFactory.create(AppModule);
     // await app.listen(process.env.PORT ?? 3000);
+    // Create the NestJS application with an Express adapter
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-    app.enableCors(); // Enable CORS for cross-origin requests
-    await app.init(); // Initialize the NestJS application
+
+    // Enable CORS for cross-origin requests
+    app.enableCors();
+
+    // Initialize the NestJS application
+    await app.init();
   } catch (err) {
     console.error('Error during app initialization', err);
   }
