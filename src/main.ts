@@ -11,7 +11,7 @@ async function bootstrap() {
     // Create the NestJS application with an Express adapter
 
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-    app.setGlobalPrefix('api');
+
     // Enable CORS for cross-origin requests
     app.enableCors();
 
