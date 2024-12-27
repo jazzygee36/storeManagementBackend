@@ -15,7 +15,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateProductDto } from './dto/product.dto';
 
-@Controller('/api')
+@Controller('')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
