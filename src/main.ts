@@ -9,8 +9,9 @@ async function bootstrap() {
     // const app = await NestFactory.create(AppModule);
     // await app.listen(process.env.PORT ?? 3000);
     // Create the NestJS application with an Express adapter
-    const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
+    const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+    app.setGlobalPrefix('api');
     // Enable CORS for cross-origin requests
     app.enableCors();
 
