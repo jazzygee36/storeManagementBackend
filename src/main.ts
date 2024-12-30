@@ -10,6 +10,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
     app.enableCors(); // Enable CORS if necessa
+    app.init();
 
     // Listen on the port that Vercel provides, i.e., process.env.PORT
     // await app.listen(4000);
