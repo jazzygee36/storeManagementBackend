@@ -12,7 +12,7 @@ export class Admin extends Document {
   @Prop({ default: true })
   isActive: boolean;
 
-  @Prop({ type: String })
+  @Prop({ required: true, type: String })
   username: string;
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Product' }] })

@@ -91,7 +91,7 @@ export class UserService {
     if (!comparePwd) {
       throw new NotFoundException('Password not match');
     }
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, password: user.password };
     const token = this.jwtService.sign(payload);
 
     return { message: 'Login successfully', token };
