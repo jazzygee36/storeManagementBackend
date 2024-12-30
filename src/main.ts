@@ -1,25 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
 
 const server = express();
 
 async function bootstrap() {
-  try {
-    const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-
-    app.enableCors(); // Enable CORS if necessa
-    app.init();
-
-    // Listen on the port that Vercel provides, i.e., process.env.PORT
-    // await app.listen(4000);
-    console.log('🚀 Application is deployed successfully!');
-  } catch (err) {
-    console.error('Error during app initialization', err);
-  }
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  // Enable CORS
+  app.enableCors({
+    origin: 'http://localhost:3000', // Replace with your frontend's URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // If you need to allow cookies
+  });
+  await app.listen(process.env.PORT ?? 4000);
 }
-
 bootstrap();
 
 export default server;
