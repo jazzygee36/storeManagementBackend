@@ -7,14 +7,13 @@ const server = express();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-  // Enable CORS
   app.enableCors({
-    origin: 'http://localhost:3000', // Replace with your frontend's URL
+    origin: 'http://localhost:3000', // Update as needed
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // If you need to allow cookies
+    credentials: true,
   });
-  await app.listen(process.env.PORT ?? 4000);
+  await app.init(); // Initialize the application
 }
-bootstrap();
 
-module.exports = server;
+bootstrap();
+module.exports = server; // Export the server for Vercel
