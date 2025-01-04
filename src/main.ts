@@ -17,4 +17,4 @@ async function bootstrap() {
 }
 bootstrap();
 
-export default server;
+module.exports = server;
