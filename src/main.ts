@@ -5,16 +5,22 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 
 const server = express();
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-  // Enable CORS
-  app.enableCors({
-    origin: 'http://localhost:3000', // Replace with your frontend's URL
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // If you need to allow cookies
-  });
-  await app.listen(process.env.PORT ?? 4000);
-}
-bootstrap();
+let cachedApp: any; // Cache the app instance to avoid repeated initialization
 
-export default server;
+export default async function handler(
+  req: express.Request,
+  res: express.Response,
+) {
+  if (!cachedApp) {
+    const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+    app.enableCors({
+      origin: 'http://localhost:3000', // Replace with your frontend's URL
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true, // If you need to allow cookies
+    });
+    await app.init();
+    cachedApp = server;
+  }
+
+  cachedApp(req, res); // Forward the request to the Express server
+}

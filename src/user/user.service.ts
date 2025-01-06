@@ -97,6 +97,19 @@ export class UserService {
     return { message: 'Login successfully', token };
   }
 
+  async getProfile(userId: string): Promise<Admin> {
+    const user = await this.adminModel
+      .findById(userId)
+      .populate('products') // Populates the products associated with the user
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async findAll(): Promise<Admin[]> {
     return this.adminModel.find().populate('products').exec();
   }

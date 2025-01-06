@@ -34,6 +34,11 @@ export class UserController {
     return this.userService.login(loginUserDto);
   }
 
+  @Get('profile')
+  async getProfile(@Body('userId') userId: string) {
+    return await this.userService.getProfile(userId);
+  }
+
   @Post(':id/add-products')
   async addProduct(
     @Param('id') adminId: string,
