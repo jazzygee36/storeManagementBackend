@@ -14,7 +14,7 @@ import { Product, ProductSchema } from './schemas/products';
       { name: Product.name, schema: ProductSchema },
     ]),
     JwtModule.register({
-      secret: process.env.SECRET_KEY || '4oei89504hgmndtiimmgbnshgj', // Use environment variables for this in production
+      secret: process.env.SECRET_KEY || '4oei89504hgmndtiimmgbnshgj',
       signOptions: { expiresIn: '1h' },
     }),
   ],
