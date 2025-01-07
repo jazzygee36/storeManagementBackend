@@ -94,7 +94,7 @@ export class UserService {
     const payload = { email: user.email, password: user.password };
     const token = this.jwtService.sign(payload);
 
-    return { message: 'Login successfully', token };
+    return { message: 'Login successfully', token, userId: user._id };
   }
 
   async getProfile(userId: string): Promise<Admin> {

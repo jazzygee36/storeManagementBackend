@@ -12,8 +12,8 @@ export class Product extends Document {
   @Prop({ required: true, type: Number })
   qtyBought: number;
 
-  @Prop({ type: Number })
-  goodsValue: number;
+  // @Prop({ type: Number })
+  // goodsValue: number;
 
   @Prop({ required: true, type: Number })
   salesPrice: number;
@@ -21,11 +21,11 @@ export class Product extends Document {
   @Prop({ type: Number })
   qtySold: number;
 
-  @Prop({ type: Number })
-  salesValue: number;
+  // @Prop({ type: Number })
+  // salesValue: number;
 
-  @Prop({ type: Number })
-  remainingItems: number;
+  // @Prop({ type: Number })
+  // remainingItems: number;
 
   @Prop({ type: Date })
   exp: Date;

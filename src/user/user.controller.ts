@@ -34,8 +34,8 @@ export class UserController {
     return this.userService.login(loginUserDto);
   }
 
-  @Get('profile')
-  async getProfile(@Body('userId') userId: string) {
+  @Get('/profile')
+  async getProfile(@Query('userId') userId: string) {
     return await this.userService.getProfile(userId);
   }
 
