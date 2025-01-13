@@ -17,6 +17,9 @@ export class Admin extends Document {
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Product' }] })
   products: MongooseSchema.Types.ObjectId[];
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Staff' }] })
+  staff: MongooseSchema.Types.ObjectId[];
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

@@ -1,26 +1,30 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+// import { Transform } from 'class-transformer';
 export class CreateProductDto {
   @IsNotEmpty()
-  @IsString()
+  // @IsString()
   productName: string;
 
   @IsNotEmpty()
-  @IsString()
   unitPrice: number;
 
   @IsNotEmpty()
-  @IsString()
   qtyBought: string;
 
   @IsNotEmpty()
-  @IsString()
   salesPrice: string;
 
-  qtySold: string;
+  @IsOptional()
+  qtyRemaining: string;
 
+  @IsOptional()
+  availability: string;
+
+  // @Transform(({ value }) => moment(value, 'DD/MM/YYYY', true).toDate())
+  @IsOptional()
   exp: string;
 
-  @IsNotEmpty()
-  @IsString()
-  availability: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // availability: string;
 }

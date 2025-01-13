@@ -12,26 +12,35 @@ export class Product extends Document {
   @Prop({ required: true, type: Number })
   qtyBought: number;
 
-  // @Prop({ type: Number })
-  // goodsValue: number;
-
   @Prop({ required: true, type: Number })
   salesPrice: number;
 
-  @Prop({ type: Number })
-  qtySold: number;
+  @Prop({
+    type: Number,
+    default: function (this: Product) {
+      return this.qtyBought;
+    },
+  })
+  qtyRemaining: number;
 
-  // @Prop({ type: Number })
-  // salesValue: number;
-
-  // @Prop({ type: Number })
-  // remainingItems: number;
+  @Prop({ type: String })
+  availability: string;
 
   @Prop({ type: Date })
   exp: Date;
-
-  @Prop({ required: true, type: String })
-  availability: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+// Add pre-save middleware to calculate `availability`
+ProductSchema.pre('save', function (next) {
+  if (this.qtyRemaining === 0) {
+    this.availability = 'Out-of-stock';
+  } else if (this.qtyRemaining < 4) {
+    this.availability = 'Low';
+  } else {
+    this.availability = 'In-stock';
+  }
+
+  next();
+});
