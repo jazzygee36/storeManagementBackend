@@ -5,6 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { Admin } from './schemas/user.schema';
@@ -20,6 +21,8 @@ import { Product } from './schemas/products';
 import { Staff, StaffSchema } from './schemas/staff';
 import { StaffDto } from './dto/staff.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
+import { SaleReportDto } from './dto/sales-report';
+import { SalesReport } from './schemas/sales-report';
 
 @Injectable()
 export class UserService {
@@ -27,6 +30,7 @@ export class UserService {
     @InjectModel(Admin.name) private adminModel: Model<Admin>,
     @InjectModel(Product.name) private productModel: Model<Product>,
     @InjectModel(Staff.name) private staffModel: Model<Staff>,
+    @InjectModel(SalesReport.name) private SalesReportModel: Model<SalesReport>,
 
     private emailService: EmailService,
     private readonly jwtService: JwtService,
@@ -76,13 +80,14 @@ export class UserService {
   }
   // Products
   async addProduct(adminId: string, productData: CreateProductDto) {
-    // Perform a case-insensitive search for the product name
-    const productName = await this.productModel.findOne({
+    // Perform a case-insensitive search for the product name specific to the admin
+    const existingProduct = await this.productModel.findOne({
+      admin: adminId, // Ensure it matches the admin
       productName: { $regex: new RegExp(`^${productData.productName}$`, 'i') },
     });
 
-    if (productName) {
-      throw new ConflictException('Product already exists');
+    if (existingProduct) {
+      throw new ConflictException('Product already exists for this admin');
     }
 
     const product = new this.productModel({ ...productData, admin: adminId });
@@ -98,6 +103,7 @@ export class UserService {
 
     await product.save();
 
+    // Update the admin's product list
     await this.adminModel.findByIdAndUpdate(adminId, {
       $push: { products: product._id },
     });
@@ -174,7 +180,7 @@ export class UserService {
   async getProfile(userId: string): Promise<Admin> {
     const user = await this.adminModel
       .findById(userId)
-      .populate('products') // Populates the products associated with the user
+      .populate('products')
       .exec();
 
     if (!user) {
@@ -328,17 +334,17 @@ export class UserService {
     }
 
     // Get the products created by the admin
-    const products = await this.productModel.find({ admin: admin._id });
+    // const products = await this.productModel.find({ admin: admin._id });
 
     // Create the token payload
-    // const payload = { username: staff.username, role: 'staff' };
-    // const token = this.jwtService.sign(payload);
+    const payload = { phoneNumber: staff.phoneNumber, role: 'staff' };
+    const token = this.jwtService.sign(payload);
 
     return {
       message: 'Login successful',
-      // token,
+      token,
       staffId: staff._id,
-      products, // Include products created by the admin in the response
+      // products,
     };
   }
 
@@ -348,6 +354,81 @@ export class UserService {
       throw new NotFoundException('Staff not found');
     }
     return staff;
+  }
+
+  async dailySalesReport(
+    staffId: string,
+    salesReportDtos: SaleReportDto[],
+  ): Promise<any> {
+    const results = [];
+
+    for (const saleReportDto of salesReportDtos) {
+      const product = await this.productModel.findById(saleReportDto.productId);
+      if (!product) {
+        throw new NotFoundException(
+          `Product not found for ID: ${saleReportDto.productId}`,
+        );
+      }
+
+      if (saleReportDto.qtySold > product.qtyRemaining) {
+        throw new NotFoundException(
+          `Not enough stock for product: ${product.productName}`,
+        );
+      }
+
+      // Update product stock
+      product.qtyRemaining -= saleReportDto.qtySold;
+      await product.save();
+
+      // Create sales report
+      const sale = await this.SalesReportModel.create({
+        ...saleReportDto,
+        staff: staffId,
+        productName: product.productName,
+        date: new Date(), // Ensure sales have a date
+      });
+
+      results.push({
+        saleId: sale._id,
+        productName: product.productName,
+        qtySold: saleReportDto.qtySold,
+        totalPrice: saleReportDto.totalPrice,
+        sellingPrice: saleReportDto.sellingPrice,
+        paymentMethod: saleReportDto.paymentMethod,
+      });
+    }
+
+    return {
+      message: 'Sales recorded successfully',
+      results,
+    };
+  }
+
+  async getDailySalesReport(staffId: string): Promise<any> {
+    const sales = await this.SalesReportModel.find({ staff: staffId })
+      .populate('staff', 'username phoneNumber')
+      .exec();
+
+    const groupedSales = sales.reduce((acc, sale) => {
+      const saleDate = sale.date.toISOString().split('T')[0]; // Group by date (YYYY-MM-DD)
+
+      if (!acc[saleDate]) {
+        acc[saleDate] = {
+          sales: [],
+          grandTotal: 0,
+        };
+      }
+
+      acc[saleDate].sales.push(sale);
+      acc[saleDate].grandTotal += sale.totalPrice; // Sum total prices for GrandTotal
+
+      return acc;
+    }, {});
+
+    return {
+      message: 'Sales retrieved successfully',
+      salesByDate: groupedSales,
+    };
   }
 
   async deleteStaff(staffId: string) {

@@ -4,7 +4,7 @@ import mongoose, { Document } from 'mongoose';
 @Schema({ timestamps: true })
 export class Product extends Document {
   @Prop({ required: true })
-  productName: string; // Renamed 'products' to 'productName' for clarity
+  productName: string;
 
   @Prop({ required: true, type: Number })
   unitPrice: number;
@@ -28,6 +28,9 @@ export class Product extends Document {
 
   @Prop({ type: Date })
   exp: Date;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true })
+  admin: mongoose.Schema.Types.ObjectId; // Reference to the Admin model
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

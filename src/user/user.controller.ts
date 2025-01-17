@@ -13,6 +13,7 @@ import {
   ValidationPipe,
   UseGuards,
   Put,
+  UsePipes,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
@@ -22,6 +23,7 @@ import { CreateProductDto } from './dto/product.dto';
 import { StaffDto } from './dto/staff.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
 import { Product } from './schemas/products';
+import { SaleReportDto } from './dto/sales-report';
 
 @Controller('')
 export class UserController {
@@ -133,5 +135,23 @@ export class UserController {
     @Param('id') productId: string, // Validate that `id` is a valid UUID
   ) {
     return this.userService.deleteStaff(productId);
+  }
+
+  //END POINTS FOR DAILY SALES REPORT
+  @Post(':staffId/daily-sales')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async dailySalesReport(
+    @Param('staffId') staffId: string,
+    @Body() salesReportDtos: SaleReportDto[],
+  ) {
+    return this.userService.dailySalesReport(staffId, salesReportDtos);
+  }
+
+  @Get('daily-sales-report/:staffId')
+  async getDailySalesReport(
+    @Param('staffId') staffId: string,
+    @Query('date') date?: string,
+  ) {
+    return this.userService.getDailySalesReport(staffId);
   }
 }

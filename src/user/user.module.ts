@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { EmailService } from './email-service';
 import { Product, ProductSchema } from './schemas/products';
 import { Staff, StaffSchema } from './schemas/staff';
+import { SalesReport, SalesReportSchema } from './schemas/sales-report';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Staff, StaffSchema } from './schemas/staff';
       { name: Admin.name, schema: AdminSchema },
       { name: Product.name, schema: ProductSchema },
       { name: Staff.name, schema: StaffSchema },
+      { name: SalesReport.name, schema: SalesReportSchema },
     ]),
     JwtModule.register({
       secret: process.env.SECRET_KEY || '4oei89504hgmndtiimmgbnshgj',
